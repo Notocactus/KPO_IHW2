@@ -21,61 +21,61 @@ class Cooking(private val order: Order): CookState {
         isCooking = true
         var time: Long
 
-        do {
-            lock.lock()
-            try {
-                time = needsCooking.toLong()
-                needsCooking = 0u
-                Thread.sleep(time)
-                isDone = true
-                order.state = Cooked(order)
-            } finally {
-                lock.unlock()
-            }
-        } while (time > 0)
 //        do {
-//            lock.withLock {
+//            lock.lock()
+//            try {
 //                time = needsCooking.toLong()
 //                needsCooking = 0u
+//                Thread.sleep(time)
+//                isDone = true
+//                order.state = Cooked(order)
+//            } finally {
+//                lock.unlock()
 //            }
-//            Thread.sleep(time)
-//            needsCooking--;
 //        } while (time > 0)
-//        lock.withLock {
-//            isDone = true
-//            order.state = Cooked(order)
-//        }
-    }
-
-    override fun addMeal(meal: Meal) {
-        if (isDone) throw Exception("Order has already finished cooking")
-        order.meals.add(meal)
-        needsCooking += meal.cookingTime
-    }
-
-    override fun cook() {
-        if (isCooking) return
-        val thread = Thread {
-            this.cookThread()
+        do {
+            lock.withLock {
+                time = needsCooking.toLong()
+                needsCooking = 0u
+            }
+            Thread.sleep(time)
+            needsCooking--;
+        } while (time > 0)
+        lock.withLock {
+            isDone = true
+            order.state = Cooked(order)
         }
-        thread.isDaemon = true
-        thread.start()
     }
 
 //    override fun addMeal(meal: Meal) {
-//        lock.withLock {
-//            if (isDone) throw Exception("Order has already finished cooking")
-//            order.meals.add(meal)
-//            needsCooking += meal.cookingTime
-//        }
+//        if (isDone) throw Exception("Order has already finished cooking")
+//        order.meals.add(meal)
+//        needsCooking += meal.cookingTime
 //    }
 //
 //    override fun cook() {
 //        if (isCooking) return
 //        val thread = Thread {
-//            cookThread()
+//            this.cookThread()
 //        }
 //        thread.isDaemon = true
 //        thread.start()
 //    }
+
+    override fun addMeal(meal: Meal) {
+        lock.withLock {
+            if (isDone) throw Exception("Order has already finished cooking")
+            order.meals.add(meal)
+            needsCooking += meal.cookingTime
+        }
+    }
+
+    override fun cook() {
+        if (isCooking) return
+        val thread = Thread {
+            cookThread()
+        }
+        thread.isDaemon = true
+        thread.start()
+    }
 }

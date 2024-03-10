@@ -1,4 +1,4 @@
-package com.example.features.changeMealAmount
+package com.example.features.changeMealTime
 
 import com.example.entities.UserAdmin
 import com.example.entities.AuthenticationManager
@@ -11,13 +11,13 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ChangeMealModerRequest(val token: ULong, val meal: String, val amount: UInt = 1u)
+data class ChangeMealTimeModelRequest(val token: ULong, val meal: String, val time: Int)
 
 
-fun Application.changeMealAmount() {
+fun Application.changeMealPrice() {
     routing {
-        post("/changeMealAmount") {
-            val result = call.receive<ChangeMealModerRequest>()
+        post("/changeMealPrice") {
+            val result = call.receive<ChangeMealTimeModelRequest>()
 
             val authManager = AuthenticationManager
 
@@ -30,17 +30,17 @@ fun Application.changeMealAmount() {
             val user = authManager.getUserByLogin(username!!)
 
             if (user == null || user is UserVisitor) {
-                call.respond(HttpStatusCode.Forbidden, "please authorise as admin")
+                call.respond(HttpStatusCode.Forbidden, "authorise as admin first")
             }
 
             try {
-                (user as UserAdmin).dbAdapter.changeMealAmount(result.meal, result.amount)
+                (user as UserAdmin).dbAdapter.changeMealTime(result.meal, result.time)
             } catch (e: NullPointerException) {
                 call.respond(HttpStatusCode.BadGateway, "something went wrong")
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.BadGateway)
             }
-            call.respond(HttpStatusCode.OK, "amount changed successfully")
+            call.respond(HttpStatusCode.OK, "meal time changed")
         }
     }
 }

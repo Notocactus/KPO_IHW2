@@ -259,7 +259,7 @@ object DBAdapter {
         manager.performExecuteUpdate(updateMealAmountValue)
     }
 
-    fun increaseMealAmount(name: String, amount: UInt = 1u){
+    fun changeMealAmount(name: String, amount: UInt = 1u){
         val selectByMealNameRequest = """
         select * from menu
         where name = '$name';
@@ -286,6 +286,22 @@ object DBAdapter {
         }
         val updateMealCostValue = """
         UPDATE menu SET price = '$price'
+        WHERE name = '$name';
+        """.trimIndent()
+        manager.performExecuteUpdate(updateMealCostValue)
+    }
+
+    fun changeMealTime(name: String, time: Int){
+        val selectByMealNameRequest = """
+        select * from menu
+        where name = '$name';
+        """.trimIndent()
+        val result = manager.performExecuteQuery(selectByMealNameRequest) ?: throw NullPointerException()
+        if (!result.next()){
+            throw NullPointerException()
+        }
+        val updateMealCostValue = """
+        UPDATE menu SET time = '$time'
         WHERE name = '$name';
         """.trimIndent()
         manager.performExecuteUpdate(updateMealCostValue)
