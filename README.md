@@ -7,12 +7,14 @@
 # Регистрация 
 * Для регистрации нужно использовать http://localhost:8080/register
 * Тело запроса для админа:
+
 {
     "login": "admin",
     "password": "cooladmin",
     "admin": true
 }
 * Тело запроса для клиента:
+
 {
     "login": "client",
     "password": "firstclient",
