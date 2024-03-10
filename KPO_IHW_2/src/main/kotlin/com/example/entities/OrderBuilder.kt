@@ -10,9 +10,13 @@ class OrderBuilder {
         if (!dbAdapter.isMealInMenu(mealName)) {
             throw NullPointerException("no such meal")
         }
-        meal = dbAdapter.getMeal(mealName)
-        dbAdapter.takeMealAway(meal.id)
-        order.addMeal(meal)
+        try {
+            meal = dbAdapter.getMeal(mealName)
+            dbAdapter.takeMealAway(meal.id)
+            order.addMeal(meal)
+        } catch (e: Exception) {
+            throw NullPointerException("there aren't enough resources")
+        }
     }
 
     fun removeMeal(mealName: String) {

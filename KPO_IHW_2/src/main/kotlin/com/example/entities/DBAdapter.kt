@@ -58,20 +58,20 @@ object DBAdapter {
             cookingTime int);
         """.trimIndent()
 
-        val createUsersActiveTableRequest = """
-        create table if not exists userActivity (
-            id serial primary key,
-            userId int,
-            typeOfAction varchar(256),
-            time varchar(256));
-        """.trimIndent()
-
         val createIncomeTableRequest = """
         create table if not exists income (
             id serial primary key,
             date varchar(256),
             userId int,
             sum int);
+        """.trimIndent()
+
+        val createUsersActiveTableRequest = """
+        create table if not exists userActivity (
+            id serial primary key,
+            userId int,
+            typeOfAction varchar(256),
+            time varchar(256));
         """.trimIndent()
 
         println(manager.performExecute(createUsersTableRequest))
@@ -250,7 +250,7 @@ object DBAdapter {
             throw NullPointerException()
         }
         if (result.getInt("amount").toUInt() < amount){
-            throw ArithmeticException()
+            throw ArithmeticException("There aren't enough resources")
         }
         val updateMealAmountValue = """
         UPDATE menu SET amount = amount - '$amount'

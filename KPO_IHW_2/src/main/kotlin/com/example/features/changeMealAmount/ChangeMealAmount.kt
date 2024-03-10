@@ -30,7 +30,7 @@ fun Application.changeMealAmount() {
             val user = authManager.getUserByLogin(username!!)
 
             if (user == null || user is UserVisitor) {
-                call.respond(HttpStatusCode.Forbidden, "authorise as admin first")
+                call.respond(HttpStatusCode.Forbidden, "please authorise as admin")
             }
 
             try {
@@ -40,7 +40,7 @@ fun Application.changeMealAmount() {
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.BadGateway)
             }
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.OK, "amount changed successfully")
         }
     }
 }

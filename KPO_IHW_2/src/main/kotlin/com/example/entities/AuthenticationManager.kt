@@ -39,8 +39,6 @@ object AuthenticationManager {
             throw Exception("Something went wrong")
         }
 
-
-
         if (activeUsers.activeUsers.values.indexOf(user.login) == -1) {
             var token: ULong
             do {
