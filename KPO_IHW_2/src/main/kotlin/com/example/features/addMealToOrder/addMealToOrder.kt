@@ -1,9 +1,8 @@
-package com.example.features.removeMealFromMenu
+package com.example.features.addMealToOrder
 
 import com.example.entities.UserAdmin
 import com.example.entities.AuthenticationManager
 import com.example.entities.UserVisitor
-
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -12,15 +11,15 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoveMealMenuRequestModel(val token: ULong, val meal: String)
+data class AddMealModelRequest(val token: ULong, val mealName: String)
 
-fun Application.removeMealFromMenu() {
+
+fun Application.addMealToOrder() {
     routing {
-        post("/removeMealFromMenu") {
-            val result = call.receive<RemoveMealMenuRequestModel>()
+        post("/addMealToOrder") {
+            val result = call.receive<AddMealModelRequest>()
 
             val authManager = AuthenticationManager
-
             val username = authManager.checkToken(result.token)
 
             if (username == null) {
@@ -29,18 +28,15 @@ fun Application.removeMealFromMenu() {
 
             val user = authManager.getUserByLogin(username!!)
 
-            if (user == null || user is UserVisitor) {
-                call.respond(HttpStatusCode.Forbidden, "authorise as admin first")
+            if (user == null || user is UserAdmin){
+                call.respond(HttpStatusCode.Forbidden, "authorise as visitor first")
             }
-
             try {
-                (user as UserAdmin).dbAdapter.removeMealFromMenu(result.meal)
-            } catch (e: NullPointerException) {
-                call.respond(HttpStatusCode.BadGateway, "something went wrong")
+                (user as UserVisitor).orderBuilder.addMeal(result.mealName)
             } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadGateway)
+                call.respond(HttpStatusCode.BadRequest, e.message.toString())
             }
-            call.respond(HttpStatusCode.OK, "")
+            call.respond(HttpStatusCode.OK, "added meal to order: " + result.mealName)
         }
     }
 }

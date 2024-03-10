@@ -7,11 +7,10 @@ class OrderBuilder {
     private val dbAdapter: DBAdapter = DBAdapter
     fun addMeal(mealName: String){
         val meal: Meal
-        try {
-            meal = dbAdapter.getMeal(mealName)
-        } catch (e: IndexOutOfBoundsException) {
-            throw IllegalArgumentException("no such meal")
+        if (!dbAdapter.isMealInMenu(mealName)) {
+            throw NullPointerException("no such meal")
         }
+        meal = dbAdapter.getMeal(mealName)
         dbAdapter.takeMealAway(meal.id)
         order.addMeal(meal)
     }
@@ -44,5 +43,8 @@ class OrderBuilder {
         return null
     }
 
+//    fun checkIfOrderIsEmpty(): Boolean{
+//        return order.meals.isEmpty()
+//    }
 
 }

@@ -1,9 +1,8 @@
-package com.example.features.removeMealFromMenu
+package com.example.features.changeMealAmount
 
 import com.example.entities.UserAdmin
 import com.example.entities.AuthenticationManager
 import com.example.entities.UserVisitor
-
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -12,12 +11,13 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoveMealMenuRequestModel(val token: ULong, val meal: String)
+data class ChangeMealModerRequest(val token: ULong, val meal: String, val amount: UInt = 1u)
 
-fun Application.removeMealFromMenu() {
+
+fun Application.changeMealAmount() {
     routing {
-        post("/removeMealFromMenu") {
-            val result = call.receive<RemoveMealMenuRequestModel>()
+        post("/changeMealAmount") {
+            val result = call.receive<ChangeMealModerRequest>()
 
             val authManager = AuthenticationManager
 
@@ -34,13 +34,13 @@ fun Application.removeMealFromMenu() {
             }
 
             try {
-                (user as UserAdmin).dbAdapter.removeMealFromMenu(result.meal)
+                (user as UserAdmin).dbAdapter.increaseMealAmount(result.meal, result.amount)
             } catch (e: NullPointerException) {
                 call.respond(HttpStatusCode.BadGateway, "something went wrong")
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.BadGateway)
             }
-            call.respond(HttpStatusCode.OK, "")
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

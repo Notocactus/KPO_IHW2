@@ -6,6 +6,14 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class RegistrationModel (
+    val login: String,
+    val password: String,
+    val admin: Boolean = false
+)
 
 fun Application.register() {
     routing {

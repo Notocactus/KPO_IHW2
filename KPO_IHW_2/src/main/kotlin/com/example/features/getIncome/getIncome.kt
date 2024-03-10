@@ -1,9 +1,8 @@
-package com.example.features.removeMealFromMenu
+package com.example.features.getIncome
 
 import com.example.entities.UserAdmin
 import com.example.entities.AuthenticationManager
 import com.example.entities.UserVisitor
-
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -12,12 +11,16 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoveMealMenuRequestModel(val token: ULong, val meal: String)
+data class IncomeModelRequest(val token: ULong)
 
-fun Application.removeMealFromMenu() {
+@Serializable
+data class IncomeModelResponse(val income: UInt)
+
+
+fun Application.getIncome() {
     routing {
-        post("/removeMealFromMenu") {
-            val result = call.receive<RemoveMealMenuRequestModel>()
+        post("/getIncome") {
+            val result = call.receive<IncomeModelRequest>()
 
             val authManager = AuthenticationManager
 
@@ -32,15 +35,15 @@ fun Application.removeMealFromMenu() {
             if (user == null || user is UserVisitor) {
                 call.respond(HttpStatusCode.Forbidden, "authorise as admin first")
             }
-
+            var response: UInt = 0u
             try {
-                (user as UserAdmin).dbAdapter.removeMealFromMenu(result.meal)
+                response = (user as UserAdmin).dbAdapter.getIncome()
             } catch (e: NullPointerException) {
                 call.respond(HttpStatusCode.BadGateway, "something went wrong")
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.BadGateway)
             }
-            call.respond(HttpStatusCode.OK, "")
+            call.respond(HttpStatusCode.OK, IncomeModelResponse(response))
         }
     }
 }

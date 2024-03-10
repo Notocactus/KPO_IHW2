@@ -1,9 +1,8 @@
-package com.example.features.removeMealFromMenu
+package com.example.features.addMealToMenu
 
 import com.example.entities.UserAdmin
 import com.example.entities.AuthenticationManager
 import com.example.entities.UserVisitor
-
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -12,12 +11,13 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoveMealMenuRequestModel(val token: ULong, val meal: String)
+class AddMealToMenuModelRequest(val token: ULong, val mealName: String, val mealPrice: UInt, val cookingTime: Int, val mealAmount: UInt = 0u)
 
-fun Application.removeMealFromMenu() {
+
+fun Application.addMealToMenu() {
     routing {
-        post("/removeMealFromMenu") {
-            val result = call.receive<RemoveMealMenuRequestModel>()
+        post("/addMealToMenu") {
+            val result = call.receive<AddMealToMenuModelRequest>()
 
             val authManager = AuthenticationManager
 
@@ -29,18 +29,17 @@ fun Application.removeMealFromMenu() {
 
             val user = authManager.getUserByLogin(username!!)
 
-            if (user == null || user is UserVisitor) {
+            if (user == null || user is UserVisitor){
                 call.respond(HttpStatusCode.Forbidden, "authorise as admin first")
             }
-
-            try {
-                (user as UserAdmin).dbAdapter.removeMealFromMenu(result.meal)
-            } catch (e: NullPointerException) {
-                call.respond(HttpStatusCode.BadGateway, "something went wrong")
+            try{
+                (user as UserAdmin).dbAdapter.addMealToMenu(result.mealName, result.mealPrice, result.cookingTime, result.mealAmount)
             } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadGateway)
+                call.respond(HttpStatusCode.BadRequest, "smt went wrong")
             }
-            call.respond(HttpStatusCode.OK, "")
+
+            call.respond(HttpStatusCode.OK, "added meal menu: " + result.mealName)
+
         }
     }
 }

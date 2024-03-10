@@ -8,10 +8,15 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ChangeMealPriceModelRequest(val token: ULong, val meal: String, val price: UInt)
+
 
 fun Application.changeMealPrice() {
     routing {
-        post("/change_meal_price") {
+        post("/changeMealPrice") {
             val result = call.receive<ChangeMealPriceModelRequest>()
 
             val authManager = AuthenticationManager
@@ -35,7 +40,7 @@ fun Application.changeMealPrice() {
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.BadGateway)
             }
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.OK, "meal price changed")
         }
     }
 }

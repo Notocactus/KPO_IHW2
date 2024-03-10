@@ -4,17 +4,13 @@ import entities.DBAdapter
 
 class PaymentManager() {
     private val manager = DBAdapter
-    private fun validate(cardNumber: UInt): Boolean {
-        return cardNumber in 10000000u..100000000u
-    }
-    fun checkOut(user: User, cardNumber: UInt, order: Order): Boolean {
-        if (!validate(cardNumber)) return false
+    fun checkOut(user: User, order: Order): Boolean {
         try {
             manager.addSum(user.id.toInt(), "", order.getPrice())
         } catch (e: NullPointerException) {
-            throw NullPointerException("Smth wrong withdatabase")
+            throw NullPointerException("something went wrong with database")
         } catch (e: Exception) {
-            throw Exception("Smth went wrong")
+            throw Exception("something went wrong")
         }
         return true
     }

@@ -8,10 +8,15 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+class CancelOrderModelRequest(val token: ULong)
+
 
 fun Application.cancelOrder() {
     routing {
-        post("/cancel_order") {
+        post("/cancelOrder") {
             val result = call.receive<CancelOrderModelRequest>()
 
             val authManager = AuthenticationManager

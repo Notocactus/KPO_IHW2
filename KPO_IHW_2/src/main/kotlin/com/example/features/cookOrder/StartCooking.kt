@@ -1,4 +1,4 @@
-package com.example.features.removeMealFromOrder
+package com.example.features.cookOrder
 
 import com.example.entities.UserAdmin
 import com.example.entities.AuthenticationManager
@@ -11,16 +11,15 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoveMealModelRequest(val token: ULong, val meal: String)
+data class StartCookingModelRequest(val token: ULong)
 
 
-fun Application.removeMealFromOrder() {
+fun Application.cookOrder() {
     routing {
-        post("/removeMealFromOrder") {
-            val result = call.receive<RemoveMealModelRequest>()
+        post("/startCookingOrder") {
+            val result = call.receive<StartCookingModelRequest>()
 
             val authManager = AuthenticationManager
-
             val username = authManager.checkToken(result.token)
 
             if (username == null) {
@@ -33,13 +32,17 @@ fun Application.removeMealFromOrder() {
                 call.respond(HttpStatusCode.Forbidden, "authorise as visitor first")
             }
             try {
-                (user as UserVisitor).orderBuilder.removeMeal(result.meal)
+//                if ((user as UserVisitor).orderBuilder.checkIfOrderIsEmpty()) {
+//                    call.respond(HttpStatusCode.BadRequest, "order is empty")
+//                }
+//                else {
+//                    (user as UserVisitor).orderBuilder.cookOrder()
+//                }
+                (user as UserVisitor).orderBuilder.cookOrder()
             } catch (e: NoSuchMethodException) {
                 call.respond(HttpStatusCode.MethodNotAllowed, e.message.toString())
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, "can not remove this meal from the order")
             }
-            call.respond(HttpStatusCode.OK, "meal removed")
+            call.respond(HttpStatusCode.OK, "order started cooking")
         }
     }
 }

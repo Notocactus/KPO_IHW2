@@ -202,16 +202,17 @@ object DBAdapter {
         manager.performExecuteUpdate(insertRequest)
     }
 
-    fun isMealInMenu(name: String): Meal {
+    fun isMealInMenu(name: String): Boolean {
         val selectByMealNameRequest = """
         select * from menu
         where name = '$name';
         """.trimIndent()
         val result = manager.performExecuteQuery(selectByMealNameRequest) ?: throw NullPointerException()
         if (!result.next()){
-            throw NullPointerException()
+            return false
         }
-        return Meal(result.getString("name"),result.getInt("cookingTime").toUInt(),result.getInt("price").toUInt(), result.getInt("id"))
+        return true
+//        return Meal(result.getString("name"),result.getInt("cookingTime").toUInt(),result.getInt("price").toUInt(), result.getInt("id"))
     }
 
     fun getIncomePerDay(date: String): UInt{

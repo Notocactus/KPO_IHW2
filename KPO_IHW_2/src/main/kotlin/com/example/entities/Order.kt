@@ -10,9 +10,11 @@ class Order() {
         }
         return total
     }
+
     fun addMeal(meal:Meal): Unit{
         state.addMeal(meal)
     }
+
     fun cook():Unit{
         state.cook()
     }

@@ -9,11 +9,19 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class UserActivityModelRequest(val token: ULong)
+
+@Serializable
+data class UserActivityModelResponse(val activity: List<UserActivity>)
+
 
 fun Application.getUserActivity() {
     routing {
-        post("/activity") {
-            val result = call.receive<ActivityModelRequest>()
+        post("/userActivity") {
+            val result = call.receive<UserActivityModelRequest>()
 
             val authManager = AuthenticationManager
 
@@ -36,7 +44,7 @@ fun Application.getUserActivity() {
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.BadGateway)
             }
-            call.respond(HttpStatusCode.OK, ActivityModelResponse(response!!))
+            call.respond(HttpStatusCode.OK, UserActivityModelResponse(response!!))
         }
     }
 }
